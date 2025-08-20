@@ -169,7 +169,7 @@ const trackFormSubmission = () => {
     setOtpError('');
 
     try {
-      const response = await fetch('https://test2.codevab.com/api/send-otp', {
+      const response = await fetch('http://localhost:4000/api/send-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ const trackFormSubmission = () => {
     try {
       const normalizedEmail = formData.email.toLowerCase().trim();
 
-      const response = await fetch('https://test2.codevab.com/api/verify-otp', {
+      const response = await fetch('http://localhost:4000/api/verify-otp', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -509,7 +509,7 @@ const trackFormSubmission = () => {
       formDataToSend.append('emailVerified', 'true');
       formDataToSend.append('declarationAgreed', declarationAgreed ? 'true' : 'false'); // ADD THIS LINE
 
-      const response = await fetch('https://test2.codevab.com/api/applications', {
+      const response = await fetch('http://localhost:4000/api/applications', {
         method: 'POST',
         body: formDataToSend
       });

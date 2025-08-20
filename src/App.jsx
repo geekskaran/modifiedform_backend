@@ -1,13 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import ApplicationForm from './components/ApplicationForm';
-import ApplicationsList from './components/ApplicationList';
-import Login from './components/Login';
 
-// Protected Route Component
-const ProtectedRoute = ({ children }) => {
+// Public Components
+import ApplicationForm from './components/ApplicationForm';
+
+// Admin Components
+import AdminLayout from './components/layout/AdminLayout';
+import Login from './components/Login';
+import Dashboard from './components/dashboard/Dashboard';
+import TemplateList from './components/template/TemplateList';
+import TemplateForm from './components/template/TemplateForm';
+import ApplicationsGrid from './components/applications/ApplicationsGrid';
+import BulkEmailManagement from './components/bulk-email/BulkEmailManagement';
+
+// Auth Hook
+const useAuth = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     checkAuth();
@@ -15,15 +25,22 @@ const ProtectedRoute = ({ children }) => {
 
   const checkAuth = () => {
     const token = localStorage.getItem('adminToken');
-    const user = localStorage.getItem('adminUser');
+    const userData = localStorage.getItem('adminUser');
     
-    if (token && user) {
-      setIsAuthenticated(true);
+    if (token && userData) {
+      try {
+        setUser(JSON.parse(userData));
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+        handleLogout();
+      }
     }
     setLoading(false);
   };
 
-  const handleLoginSuccess = () => {
+  const handleLoginSuccess = (userData) => {
+    setUser(userData);
     setIsAuthenticated(true);
   };
 
@@ -31,9 +48,21 @@ const ProtectedRoute = ({ children }) => {
     localStorage.removeItem('adminToken');
     localStorage.removeItem('adminUser');
     setIsAuthenticated(false);
+    setUser(null);
   };
 
-  if (loading) {
+  return {
+    isAuthenticated,
+    loading,
+    user,
+    handleLoginSuccess,
+    handleLogout
+  };
+};
+
+// Protected Route Component
+const ProtectedRoute = ({ children, auth }) => {
+  if (auth.loading) {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
@@ -44,40 +73,122 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Login onLoginSuccess={handleLoginSuccess} />;
+  if (!auth.isAuthenticated) {
+    return <Navigate to="/admin/login" replace />;
   }
 
   return (
-    <div>
-      {/* Logout Button */}
-      <div className="bg-white shadow-sm border-b p-4 flex justify-end">
-        <button
-          onClick={handleLogout}
-          className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
-        >
-          Logout
-        </button>
-      </div>
+    <AdminLayout user={auth.user} onLogout={auth.handleLogout}>
       {children}
-    </div>
+    </AdminLayout>
   );
 };
 
+// Admin Login Route
+const AdminLoginRoute = ({ auth }) => {
+  if (auth.loading) {
+    return (
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className="text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (auth.isAuthenticated) {
+    return <Navigate to="/admin/dashboard" replace />;
+  }
+
+  return <Login onLoginSuccess={auth.handleLoginSuccess} />;
+};
+
 function App() {
+  const auth = useAuth();
+
   return (
     <Router>
       <div className="min-h-screen bg-gray-100">
         <Routes>
+          {/* Public Routes */}
           <Route path="/" element={<ApplicationForm />} />
+          
+          {/* Admin Login */}
           <Route 
-            path="/applications" 
+            path="/admin/login" 
+            element={<AdminLoginRoute auth={auth} />} 
+          />
+          
+          {/* Admin Routes - All Protected */}
+          <Route 
+            path="/admin/dashboard" 
             element={
-              <ProtectedRoute>
-                <ApplicationsList />
+              <ProtectedRoute auth={auth}>
+                <Dashboard />
               </ProtectedRoute>
             } 
           />
+          
+          <Route 
+            path="/admin/template" 
+            element={
+              <ProtectedRoute auth={auth}>
+                <TemplateList />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/admin/template/create" 
+            element={
+              <ProtectedRoute auth={auth}>
+                <TemplateForm />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/admin/template/edit/:id" 
+            element={
+              <ProtectedRoute auth={auth}>
+                <TemplateForm />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/admin/applications" 
+            element={
+              <ProtectedRoute auth={auth}>
+                <ApplicationsGrid />
+              </ProtectedRoute>
+            } 
+          />
+          
+          <Route 
+            path="/admin/bulk-email" 
+            element={
+              <ProtectedRoute auth={auth}>
+                <BulkEmailManagement />
+              </ProtectedRoute>
+            } 
+          />
+          
+          {/* Redirect /admin to dashboard */}
+          <Route 
+            path="/admin" 
+            element={<Navigate to="/admin/dashboard" replace />} 
+          />
+          
+          {/* Legacy route redirect */}
+          <Route 
+            path="/applications" 
+            element={<Navigate to="/admin/applications" replace />} 
+          />
+          
+          {/* Catch all - redirect to home */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </div>
     </Router>

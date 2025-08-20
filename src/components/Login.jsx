@@ -22,7 +22,7 @@ const Login = ({ onLoginSuccess }) => {
     setError('');
 
     try {
-      const response = await fetch('https://test2.codevab.com/api/auth/login', {
+      const response = await fetch('http://localhost:4000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -33,10 +33,16 @@ const Login = ({ onLoginSuccess }) => {
       const result = await response.json();
 
       if (response.ok) {
-        localStorage.setItem('adminToken', result.token);
-        localStorage.setItem('adminUser', JSON.stringify(result.user));
-        onLoginSuccess();
-      } else {
+  console.log('Login response:', result);
+  localStorage.setItem('adminToken', result.token);
+  localStorage.setItem('adminUser', JSON.stringify(result.user));
+  
+  // Debug token storage
+  console.log('Token saved:', localStorage.getItem('adminToken'));
+  console.log('User saved:', localStorage.getItem('adminUser'));
+  
+  onLoginSuccess();
+} else {
         setError(result.message || 'Login failed');
       }
     } catch (error) {
