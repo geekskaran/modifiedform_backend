@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <link rel="icon" href="https://i.ibb.co/N6HrptBN/corevalogo.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#000000" />
+  
+  <!-- Set proper status code for real 404s -->
+  <meta http-equiv="Status" content="404 Not Found">
+
+  <!-- SEO tags for 404 page -->
+  <title>Page Not Found | Coreva</title>
+  <meta name="description" content="Sorry, the page you are looking for does not exist. Browse our website for web development, app development, and digital marketing services." />
+  <meta name="robots" content="noindex, follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://coreva.in/404" />
+  <meta property="og:title" content="Page Not Found | Coreva" />
+  <meta property="og:description" content="Sorry, the page you are looking for does not exist. Browse our website for web development, app development, and digital marketing services." />
+  <meta property="og:image" content="https://i.ibb.co/N6HrptBN/corevalogo.png" />
+
+  <!-- Canonical - point to the 404 page to avoid soft 404 issues -->
+  <link rel="canonical" href="https://coreva.in/404" id="canonical-link" />
+
+  <!-- Script to redirect to SPA after saving the intended URL -->
+  <script>
+    // Store the URL the user was trying to access
+    sessionStorage.redirect = window.location.href;
+    
+    // Redirect to the homepage where React will handle the routing
+    window.location.href = '/';
+  </script>
+</head>
+
+<body>
+  <noscript>
+    <h1>Page Not Found</h1>
+    <p>Sorry, the page you are looking for does not exist.</p>
+    <p><a href="https://coreva.in/">Return to Homepage</a></p>
+  </noscript>
+</body>
+
+</html>
