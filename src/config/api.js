@@ -1,5 +1,5 @@
 const API_CONFIG = {
-  baseURL: 'http://localhost:4000/api',
+  baseURL: 'https://test2.codevab.com/api',
   timeout: 10000
 };
 

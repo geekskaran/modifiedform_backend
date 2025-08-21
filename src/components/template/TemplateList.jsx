@@ -89,9 +89,9 @@ const TemplateList = () => {
         sortOrder
       });
 
-      console.log('Fetching templates from:', `http://localhost:4000/api/email-templates?${params}`);
+      console.log('Fetching templates from:', `https://test2.codevab.com/api/email-templates?${params}`);
 
-      const response = await fetch(`http://localhost:4000/api/email-templates?${params}`, {
+      const response = await fetch(`https://test2.codevab.com/api/email-templates?${params}`, {
         headers: getAuthHeaders()
       });
 
@@ -147,7 +147,7 @@ const TemplateList = () => {
     if (!isMountedRef.current) return;
 
     try {
-      const response = await fetch(`http://localhost:4000/api/email-templates/${templateId}`, {
+      const response = await fetch(`https://test2.codevab.com/api/email-templates/${templateId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -183,7 +183,7 @@ const TemplateList = () => {
         }
       };
 
-      const response = await fetch('http://localhost:4000/api/email-templates', {
+      const response = await fetch('https://test2.codevab.com/api/email-templates', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(duplicateData)

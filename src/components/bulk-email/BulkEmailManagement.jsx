@@ -65,7 +65,7 @@ const BulkEmailManagement = () => {
       setLoading(true);
       setError('');
       
-      let url = `http://localhost:4000/api/bulk-email?page=${currentPage}&limit=20`;
+      let url = `https://test2.codevab.com/api/bulk-email?page=${currentPage}&limit=20`;
       if (searchTerm) url += `&search=${encodeURIComponent(searchTerm)}`;
       if (statusFilter) url += `&status=${statusFilter}`;
       if (templateFilter) url += `&templateId=${templateFilter}`;
@@ -97,7 +97,7 @@ const BulkEmailManagement = () => {
 
   const fetchStats = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/bulk-email/stats/overview', {
+      const response = await fetch('https://test2.codevab.com/api/bulk-email/stats/overview', {
         headers: getAuthHeaders()
       });
 
@@ -114,7 +114,7 @@ const BulkEmailManagement = () => {
     try {
       setRecipientsLoading(true);
       
-      let url = `http://localhost:4000/api/bulk-email/${campaignId}/recipients?page=1&limit=100`;
+      let url = `https://test2.codevab.com/api/bulk-email/${campaignId}/recipients?page=1&limit=100`;
       if (status) url += `&status=${status}`;
 
       const response = await fetch(url, {
@@ -140,7 +140,7 @@ const BulkEmailManagement = () => {
     try {
       setRetrying(campaignId);
       
-      const response = await fetch(`http://localhost:4000/api/bulk-email/${campaignId}/retry`, {
+      const response = await fetch(`https://test2.codevab.com/api/bulk-email/${campaignId}/retry`, {
         method: 'POST',
         headers: getAuthHeaders()
       });
@@ -166,7 +166,7 @@ const BulkEmailManagement = () => {
     try {
       setCancelling(campaignId);
       
-      const response = await fetch(`http://localhost:4000/api/bulk-email/${campaignId}/cancel`, {
+      const response = await fetch(`https://test2.codevab.com/api/bulk-email/${campaignId}/cancel`, {
         method: 'PUT',
         headers: getAuthHeaders()
       });

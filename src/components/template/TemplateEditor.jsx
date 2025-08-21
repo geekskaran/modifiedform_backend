@@ -70,7 +70,7 @@ const TemplateForm = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/email-templates/utils/categories', {
+      const response = await fetch('https://test2.codevab.com/api/email-templates/utils/categories', {
         headers: getAuthHeaders()
       });
 
@@ -85,7 +85,7 @@ const TemplateForm = () => {
 
   const fetchStandardVariables = async () => {
     try {
-      const response = await fetch('http://localhost:4000/api/email-templates/utils/variables', {
+      const response = await fetch('https://test2.codevab.com/api/email-templates/utils/variables', {
         headers: getAuthHeaders()
       });
 
@@ -101,7 +101,7 @@ const TemplateForm = () => {
   const fetchTemplate = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:4000/api/email-templates/${id}`, {
+      const response = await fetch(`https://test2.codevab.com/api/email-templates/${id}`, {
         headers: getAuthHeaders()
       });
 
@@ -224,7 +224,7 @@ const TemplateForm = () => {
         email: 'john.doe@example.com'
       };
 
-      const response = await fetch('http://localhost:4000/api/email-templates/preview', {
+      const response = await fetch('https://test2.codevab.com/api/email-templates/preview', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -280,10 +280,10 @@ const TemplateForm = () => {
       setError('');
 
       const endpoint = isEdit
-        ? `http://localhost:4000/api/email-templates/${id}`
+        ? `https://test2.codevab.com/api/email-templates/${id}`
         : asDraft
-          ? 'http://localhost:4000/api/email-templates/drafts'
-          : 'http://localhost:4000/api/email-templates';
+          ? 'https://test2.codevab.com/api/email-templates/drafts'
+          : 'https://test2.codevab.com/api/email-templates';
 
       const method = isEdit ? 'PUT' : 'POST';
 
@@ -320,7 +320,7 @@ const TemplateForm = () => {
 
     try {
       setSaving(true);
-      const response = await fetch(`http://localhost:4000/api/email-templates/drafts/${id}/publish`, {
+      const response = await fetch(`https://test2.codevab.com/api/email-templates/drafts/${id}/publish`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({

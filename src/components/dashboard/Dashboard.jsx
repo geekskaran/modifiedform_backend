@@ -35,7 +35,7 @@ const Dashboard = () => {
       setError('');
       
       // Fixed: Using correct port 5000 instead of 4000
-      const response = await fetch('http://localhost:4000/api/dashboard/overview', {
+      const response = await fetch('https://test2.codevab.com/api/dashboard/overview', {
         headers: getAuthHeaders()
       });
 

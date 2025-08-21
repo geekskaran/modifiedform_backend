@@ -70,7 +70,7 @@ const EmailTemplatesPage = () => {
         sortOrder
       });
 
-      const response = await fetch(`http://localhost:4000/api/email-templates?${params}`, {
+      const response = await fetch(`https://test2.codevab.com/api/email-templates?${params}`, {
         headers: getAuthHeaders()
       });
 
@@ -91,7 +91,7 @@ const EmailTemplatesPage = () => {
 
   const handleDeleteTemplate = async (templateId) => {
     try {
-      const response = await fetch(`http://localhost:4000/api/email-templates/${templateId}`, {
+      const response = await fetch(`https://test2.codevab.com/api/email-templates/${templateId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
@@ -122,7 +122,7 @@ const EmailTemplatesPage = () => {
         }
       };
 
-      const response = await fetch('http://localhost:4000/api/email-templates', {
+      const response = await fetch('https://test2.codevab.com/api/email-templates', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify(duplicateData)
