@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { 
-  Save, 
-  Eye, 
-  ArrowLeft, 
-  Plus, 
-  Trash2, 
+import {
+  Save,
+  Eye,
+  ArrowLeft,
+  Plus,
+  Trash2,
   AlertCircle,
   CheckCircle,
   FileText,
@@ -70,7 +70,8 @@ const TemplateForm = () => {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch('https://test2.codevab.com/api/email-templates/utils/categories', {
+      // FIXED: Changed URL to localhost:4000
+      const response = await fetch('http://localhost:4000/api/email-templates/utils/categories', {
         headers: getAuthHeaders()
       });
 
@@ -85,7 +86,8 @@ const TemplateForm = () => {
 
   const fetchStandardVariables = async () => {
     try {
-      const response = await fetch('https://test2.codevab.com/api/email-templates/utils/variables', {
+      // FIXED: Changed URL to localhost:4000
+      const response = await fetch('http://localhost:4000/api/email-templates/utils/variables', {
         headers: getAuthHeaders()
       });
 
@@ -101,7 +103,8 @@ const TemplateForm = () => {
   const fetchTemplate = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`https://test2.codevab.com/api/email-templates/${id}`, {
+      // FIXED: Changed URL to localhost:4000
+      const response = await fetch(`http://localhost:4000/api/email-templates/${id}`, {
         headers: getAuthHeaders()
       });
 
@@ -139,7 +142,7 @@ const TemplateForm = () => {
       ...prev,
       [field]: value
     }));
-    
+
     // Clear error when user starts typing
     if (error) setError('');
     if (success) setSuccess('');
@@ -174,12 +177,12 @@ const TemplateForm = () => {
         defaultValue: newVariable.defaultValue.trim(),
         isCustom: true
       };
-      
+
       setFormData(prev => ({
         ...prev,
         variables: [...prev.variables, variable]
       }));
-      
+
       setNewVariable({ name: '', description: '', defaultValue: '' });
     }
   };
@@ -191,24 +194,31 @@ const TemplateForm = () => {
     }));
   };
 
-  const insertVariable = (variableName) => {
-    const textarea = document.getElementById('htmlContent');
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const text = textarea.value;
-    const before = text.substring(0, start);
-    const after = text.substring(end, text.length);
-    const newContent = before + `{{${variableName}}}` + after;
-    
-    handleInputChange('htmlContent', newContent);
-    
-    // Focus back to textarea
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start + variableName.length + 4, start + variableName.length + 4);
-    }, 10);
-  };
+  // REPLACE THIS ENTIRE FUNCTION
+const insertVariable = (variableName) => {
+  const textarea = document.getElementById('htmlContent');
+  if (!textarea) return;
 
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const text = textarea.value;
+  const before = text.substring(0, start);
+  const after = text.substring(end, text.length);
+  const newContent = before + `{{${variableName}}}` + after;
+
+  handleInputChange('htmlContent', newContent);
+
+  // FIXED: Calculate position before setTimeout to avoid scope issues
+  const newCursorPosition = start + variableName.length + 4;
+  
+  // Focus back to textarea
+  setTimeout(() => {
+    if (textarea) {
+      textarea.focus();
+      textarea.setSelectionRange(newCursorPosition, newCursorPosition);
+    }
+  }, 10);
+};
   const handlePreview = async () => {
     if (!formData.htmlContent.trim()) {
       setError('Please add content to preview');
@@ -224,7 +234,8 @@ const TemplateForm = () => {
         email: 'john.doe@example.com'
       };
 
-      const response = await fetch('https://test2.codevab.com/api/email-templates/preview', {
+      // FIXED: Changed URL to localhost:4000
+      const response = await fetch('http://localhost:4000/api/email-templates/preview', {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -279,11 +290,12 @@ const TemplateForm = () => {
       setSaving(true);
       setError('');
 
-      const endpoint = isEdit 
-        ? `https://test2.codevab.com/api/email-templates/${id}`
-        : asDraft 
-          ? 'https://test2.codevab.com/api/email-templates/drafts'
-          : 'https://test2.codevab.com/api/email-templates';
+      // FIXED: Changed URLs to localhost:4000
+      const endpoint = isEdit
+        ? `http://localhost:4000/api/email-templates/${id}`
+        : asDraft
+          ? 'http://localhost:4000/api/email-templates/drafts'
+          : 'http://localhost:4000/api/email-templates';
 
       const method = isEdit ? 'PUT' : 'POST';
 
@@ -296,7 +308,7 @@ const TemplateForm = () => {
       if (response.ok) {
         const data = await response.json();
         setSuccess(asDraft ? 'Draft saved successfully!' : 'Template saved successfully!');
-        
+
         if (!isEdit) {
           // Redirect to edit mode after creation
           setTimeout(() => {
@@ -320,7 +332,8 @@ const TemplateForm = () => {
 
     try {
       setSaving(true);
-      const response = await fetch(`https://test2.codevab.com/api/email-templates/drafts/${id}/publish`, {
+      // FIXED: Changed URL to localhost:4000
+      const response = await fetch(`http://localhost:4000/api/email-templates/drafts/${id}/publish`, {
         method: 'POST',
         headers: getAuthHeaders(),
         body: JSON.stringify({
@@ -380,7 +393,7 @@ const TemplateForm = () => {
               </p>
             </div>
           </div>
-          
+
           <div className="flex items-center space-x-3">
             <button
               onClick={handlePreview}
@@ -394,7 +407,7 @@ const TemplateForm = () => {
               )}
               <span>Preview</span>
             </button>
-            
+
             {!isDraft && (
               <button
                 onClick={() => handleSave(true)}
@@ -405,7 +418,7 @@ const TemplateForm = () => {
                 <span>Save as Draft</span>
               </button>
             )}
-            
+
             {isDraft ? (
               <button
                 onClick={handlePublishDraft}
@@ -464,7 +477,7 @@ const TemplateForm = () => {
           {/* Basic Information */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Basic Information</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -511,7 +524,7 @@ const TemplateForm = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Use {{variableName}} for dynamic content
+                  Use {{ variableName }} for dynamic content
                 </p>
               </div>
 
@@ -539,7 +552,7 @@ const TemplateForm = () => {
                 <span>HTML Supported</span>
               </div>
             </div>
-            
+
             <div>
               <textarea
                 id="htmlContent"
@@ -550,7 +563,7 @@ const TemplateForm = () => {
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono text-sm"
               />
               <p className="text-xs text-gray-500 mt-2">
-                Use HTML tags for formatting. Variables like {{name}}, {{applicationId}} will be replaced with actual values.
+                Use HTML tags for formatting. Variables like {{ name }}, {{ applicationId }} will be replaced with actual values.
               </p>
             </div>
           </div>
@@ -558,7 +571,7 @@ const TemplateForm = () => {
           {/* Tags */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Tags</h3>
-            
+
             <div className="space-y-3">
               <div className="flex space-x-2">
                 <input
@@ -576,7 +589,7 @@ const TemplateForm = () => {
                   <Plus className="h-4 w-4" />
                 </button>
               </div>
-              
+
               {formData.metadata.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2">
                   {formData.metadata.tags.map((tag, index) => (
@@ -604,7 +617,7 @@ const TemplateForm = () => {
           {/* Standard Variables */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Available Variables</h3>
-            
+
             <div className="space-y-2">
               {standardVariables.map((variable) => (
                 <button
@@ -614,7 +627,7 @@ const TemplateForm = () => {
                 >
                   <div className="flex items-center space-x-2">
                     <Hash className="h-4 w-4 text-gray-400" />
-                    <span className="font-mono text-sm text-blue-600">{`{${variable.name}}`}</span>
+                    <span className="font-mono text-sm text-blue-600">{`{{${variable.name}}}`}</span>
                   </div>
                   <p className="text-xs text-gray-500 mt-1">{variable.description}</p>
                 </button>
@@ -625,7 +638,7 @@ const TemplateForm = () => {
           {/* Custom Variables */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Custom Variables</h3>
-            
+
             <div className="space-y-3">
               <div>
                 <input
@@ -671,7 +684,7 @@ const TemplateForm = () => {
                 {formData.variables.map((variable, index) => (
                   <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
                     <div>
-                      <span className="font-mono text-sm text-blue-600">{`{${variable.name}}`}</span>
+                      <span className="font-mono text-sm text-blue-600">{`{{${variable.name}}}`}</span>
                       {variable.description && (
                         <p className="text-xs text-gray-500">{variable.description}</p>
                       )}
@@ -691,7 +704,7 @@ const TemplateForm = () => {
           {/* Quick Actions */}
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
             <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
-            
+
             <div className="space-y-2">
               <button
                 onClick={() => insertVariable('name')}
@@ -739,7 +752,7 @@ const TemplateForm = () => {
               </div>
               <div>
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Content:</h4>
-                <div 
+                <div
                   className="border border-gray-200 rounded-lg p-4 bg-white"
                   dangerouslySetInnerHTML={{ __html: previewData }}
                 />

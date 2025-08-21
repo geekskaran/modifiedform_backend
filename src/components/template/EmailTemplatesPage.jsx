@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Plus, 
   Search, 
@@ -15,10 +15,11 @@ import {
   CheckCircle,
   Clock,
   RefreshCw,
+  ArrowLeft,
   MoreVertical
 } from 'lucide-react';
 
-const TemplateList = () => {
+const EmailTemplatesPage = () => {
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -34,16 +35,6 @@ const TemplateList = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
 
-  // Use ref to track if component is mounted
-  const isMountedRef = useRef(true);
-
-  useEffect(() => {
-    isMountedRef.current = true;
-    return () => {
-      isMountedRef.current = false;
-    };
-  }, []);
-
   const categories = [
     { value: '', label: 'All Categories' },
     { value: 'success', label: 'Success/Approval' },
@@ -55,16 +46,11 @@ const TemplateList = () => {
   ];
 
   useEffect(() => {
-    if (isMountedRef.current) {
-      fetchTemplates();
-    }
+    fetchTemplates();
   }, [searchTerm, categoryFilter, statusFilter, sortBy, sortOrder, currentPage]);
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem('adminToken');
-    if (!token) {
-      throw new Error('No authentication token found');
-    }
     return {
       'Authorization': `Bearer ${token}`,
       'Content-Type': 'application/json'
@@ -72,13 +58,8 @@ const TemplateList = () => {
   };
 
   const fetchTemplates = async () => {
-    // Don't fetch if component is unmounted
-    if (!isMountedRef.current) return;
-
     try {
       setLoading(true);
-      setError('');
-
       const params = new URLSearchParams({
         page: currentPage.toString(),
         limit: '12',
@@ -89,94 +70,52 @@ const TemplateList = () => {
         sortOrder
       });
 
-      console.log('Fetching templates from:', `http://localhost:4000/api/email-templates?${params}`);
-
       const response = await fetch(`http://localhost:4000/api/email-templates?${params}`, {
         headers: getAuthHeaders()
       });
 
-      // Check if component is still mounted before updating state
-      if (!isMountedRef.current) return;
-
-      if (response.status === 401) {
-        setError('Authentication failed. Please login again.');
-        // Redirect to login after a delay
-        setTimeout(() => {
-          if (isMountedRef.current) {
-            localStorage.removeItem('adminToken');
-            localStorage.removeItem('adminUser');
-            window.location.href = '/admin/login';
-          }
-        }, 2000);
-        return;
-      }
-
       if (response.ok) {
         const data = await response.json();
-        console.log('Templates fetched successfully:', data);
-        
-        if (isMountedRef.current) {
-          setTemplates(data.templates || []);
-          setTotalPages(data.pagination?.pages || 1);
-          setTotalTemplates(data.pagination?.total || 0);
-        }
+        setTemplates(data.templates || []);
+        setTotalPages(data.pagination?.pages || 1);
+        setTotalTemplates(data.pagination?.total || 0);
       } else {
-        const errorData = await response.json();
-        console.error('Templates fetch error:', errorData);
-        if (isMountedRef.current) {
-          setError(errorData.message || `Server error: ${response.status}`);
-        }
+        setError('Failed to fetch templates');
       }
     } catch (err) {
-      console.error('Templates fetch error:', err);
-      if (isMountedRef.current) {
-        if (err.message.includes('token')) {
-          setError('Authentication error. Please login again.');
-        } else {
-          setError('Connection error. Please check if server is running on port 4000.');
-        }
-      }
+      setError('Connection error. Please check your server.');
     } finally {
-      if (isMountedRef.current) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
   };
 
   const handleDeleteTemplate = async (templateId) => {
-    if (!isMountedRef.current) return;
-
     try {
       const response = await fetch(`http://localhost:4000/api/email-templates/${templateId}`, {
         method: 'DELETE',
         headers: getAuthHeaders()
       });
 
-      if (response.ok && isMountedRef.current) {
+      if (response.ok) {
         await fetchTemplates();
         setShowDeleteModal(false);
         setSelectedTemplate(null);
-      } else if (isMountedRef.current) {
+      } else {
         setError('Failed to delete template');
       }
     } catch (err) {
-      console.error('Delete error:', err);
-      if (isMountedRef.current) {
-        setError('Connection error');
-      }
+      setError('Connection error');
     }
   };
 
   const handleDuplicateTemplate = async (template) => {
-    if (!isMountedRef.current) return;
-
     try {
       const duplicateData = {
         name: `${template.name} (Copy)`,
         category: template.category,
         subject: template.subject,
         htmlContent: template.htmlContent,
-        variables: template.variables || [],
+        variables: template.variables,
         metadata: {
           ...template.metadata,
           description: `Copy of ${template.name}`
@@ -189,16 +128,13 @@ const TemplateList = () => {
         body: JSON.stringify(duplicateData)
       });
 
-      if (response.ok && isMountedRef.current) {
+      if (response.ok) {
         await fetchTemplates();
-      } else if (isMountedRef.current) {
+      } else {
         setError('Failed to duplicate template');
       }
     } catch (err) {
-      console.error('Duplicate error:', err);
-      if (isMountedRef.current) {
-        setError('Connection error');
-      }
+      setError('Connection error');
     }
   };
 
@@ -356,13 +292,6 @@ const TemplateList = () => {
       )}
     </div>
   );
-
-  // Close dropdown when clicking outside
-  useEffect(() => {
-    const handleClickOutside = () => setActiveDropdown(null);
-    document.addEventListener('click', handleClickOutside);
-    return () => document.removeEventListener('click', handleClickOutside);
-  }, []);
 
   if (loading && templates.length === 0) {
     return (
@@ -586,4 +515,4 @@ const TemplateList = () => {
   );
 };
 
-export default TemplateList;
+export default EmailTemplatesPage;

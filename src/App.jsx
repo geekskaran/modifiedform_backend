@@ -130,8 +130,9 @@ function App() {
             } 
           />
           
+          {/* FIXED: Changed from /admin/template to /admin/templates to match sidebar */}
           <Route 
-            path="/admin/template" 
+            path="/admin/templates" 
             element={
               <ProtectedRoute auth={auth}>
                 <TemplateList />
@@ -140,7 +141,7 @@ function App() {
           />
           
           <Route 
-            path="/admin/template/create" 
+            path="/admin/templates/create" 
             element={
               <ProtectedRoute auth={auth}>
                 <TemplateForm />
@@ -149,7 +150,7 @@ function App() {
           />
           
           <Route 
-            path="/admin/template/edit/:id" 
+            path="/admin/templates/edit/:id" 
             element={
               <ProtectedRoute auth={auth}>
                 <TemplateForm />
@@ -181,7 +182,22 @@ function App() {
             element={<Navigate to="/admin/dashboard" replace />} 
           />
           
-          {/* Legacy route redirect */}
+          {/* Legacy route redirects - Keep old paths working */}
+          <Route 
+            path="/admin/template" 
+            element={<Navigate to="/admin/templates" replace />} 
+          />
+          
+          <Route 
+            path="/admin/template/create" 
+            element={<Navigate to="/admin/templates/create" replace />} 
+          />
+          
+          <Route 
+            path="/admin/template/edit/:id" 
+            element={<Navigate to="/admin/templates/edit/:id" replace />} 
+          />
+          
           <Route 
             path="/applications" 
             element={<Navigate to="/admin/applications" replace />} 
